@@ -3,6 +3,9 @@ package com.jewelcse.controller;
 
 import com.jewelcse.entity.Post;
 import com.jewelcse.service.PostService;
+import com.jewelcse.service.impl.PostServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,13 +23,10 @@ public class PostController {
     RestTemplate restTemplate = new RestTemplate();
     String url = "https://jsonplaceholder.typicode.com/posts";
 
+
+    @Autowired
     private PostService postService;
-
-    PostController(PostService service){
-        this.postService = service;
-    }
-
-
+    
     @PostMapping
     public ResponseEntity<Post> savePost(@RequestBody Post post){
         return new ResponseEntity<>(postService.savePost(post), HttpStatus.OK);
@@ -46,9 +46,8 @@ public class PostController {
 
 
     @GetMapping
-    @Cacheable(value = "posts")
-    public ResponseEntity<List<Post>> getPosts(){
-        return new ResponseEntity<>(postService.getAllPost(),HttpStatus.OK);
+    public ResponseEntity<List<Post>> getPosts(@RequestParam(defaultValue = "1") Integer page){
+        return new ResponseEntity<List<Post>>(postService.getAllPost(page),HttpStatus.OK);
     }
 
 

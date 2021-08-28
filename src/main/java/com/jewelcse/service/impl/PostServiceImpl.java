@@ -1,12 +1,15 @@
 package com.jewelcse.service.impl;
 
 
+import com.jewelcse.dao.PostDao;
 import com.jewelcse.entity.Post;
 import com.jewelcse.repository.PostRepository;
 import com.jewelcse.service.PostService;
+import com.jewelcse.utils.Mapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -16,20 +19,19 @@ import java.util.concurrent.CompletableFuture;
 @Service
 public class PostServiceImpl implements PostService {
 
+    @Autowired
+    private PostDao postDao;
 
-
-    private PostRepository postRepository;
+    @Autowired
+    private Mapper mapper;
 
     Logger logger = LoggerFactory.getLogger(PostServiceImpl.class);
 
-    PostServiceImpl(PostRepository repository){
-        this.postRepository = repository;
-    }
 
     @Override
     public Post savePost(Post post) {
         logger.info("saving data.....{}",post);
-        return postRepository.save(post);
+        return postDao.savePost(post);
     }
 
 
@@ -40,15 +42,15 @@ public class PostServiceImpl implements PostService {
         logger.info("saving data.....");
         long start = System.currentTimeMillis();
         logger.info("posts size {} ",posts.size());
-        postRepository.saveAll(posts);
+        postDao.saveAllPost(posts);
         long end = System.currentTimeMillis();
         logger.info("Total time {}", (end - start));
         return CompletableFuture.completedFuture(posts);
     }
 
     @Override
-    public List<Post> getAllPost() {
+    public List<Post> getAllPost(Integer page) {
         logger.info("fetching data from DB");
-        return postRepository.findAll();
+        return mapper.convertToList(postDao.getAllPost(page),Post.class);
     }
 }

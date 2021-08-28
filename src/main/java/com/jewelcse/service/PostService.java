@@ -10,5 +10,5 @@ public interface PostService {
 
     Post savePost(Post post);
     CompletableFuture<List<Post>> saveAllPost(List<Post> asList);
-    List<Post> getAllPost();
+    List<Post> getAllPost(Integer page);
 }
